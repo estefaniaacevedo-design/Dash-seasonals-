@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Deals — Rappi Turbo MX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-gray-50 text-gray-800 transition-colors duration-500 min-h-screen">
+
+    <div id="pantalla-login" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md text-center border border-gray-100">
+            <div class="mb-6 flex justify-center">
+                <div class="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
+                    <span class="text-3xl text-white font-bold">⚡</span>
+                </div>
+            </div>
+            <h1 class="text-2xl font-extrabold text-gray-900 mb-2">Viral Deals Turbo</h1>
+            <p class="text-gray-500 mb-8 text-sm">Inicia sesión con tu cuenta corporativa para acceder al dashboard de inventario y promociones.</p>
+            
+            <div id="google-btn-container" class="mt-6 flex justify-center"></div>
+        </div>
+    </div>
+
+    <div id="contenido-dashboard" class="hidden min-h-screen bg-gray-950 text-gray-200 p-8 font-sans">
+        
+        <header class="flex justify-between items-center mb-10 pb-6 border-b border-gray-800">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <span class="text-2xl text-white font-bold">⚡</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white tracking-tight">Viral Deals <span class="text-orange-500">Turbo MX</span></h1>
+                    <p class="text-sm text-gray-400">Panel de Control de Temporadas</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 bg-gray-900 px-4 py-2 rounded-full border border-gray-800">
+                <span class="text-sm text-gray-300 font-medium" id="user-email-display">usuario@rappi.com</span>
+                <button onclick="cerrarSesion()" class="text-sm text-red-400 hover:text-red-300 font-bold transition-colors">
+                    Salir
+                </button>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto">
+            <div class="mb-10">
+                <h2 class="text-lg font-bold text-gray-300 mb-4 uppercase tracking-wider text-sm">1. Selecciona el evento</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div id="s-mundial" onclick="cambiarSeasonal('Mundial', 's-mundial')" class="seasonal-item cursor-pointer bg-gray-800 border border-orange-500 rounded-xl p-4 text-center transition-all shadow-lg">
+                        <div class="text-3xl mb-2">⚽</div>
+                        <div class="font-bold text-gray-200">Mundial</div>
+                    </div>
+                    <div id="s-verano" onclick="cambiarSeasonal('Verano', 's-verano')" class="seasonal-item cursor-pointer bg-gray-800/50 border border-gray-600 hover:border-gray-500 rounded-xl p-4 text-center transition-all">
+                        <div class="text-3xl mb-2">☀️</div>
+                        <div class="font-bold text-gray-200">Verano</div>
+                    </div>
+                    <div id="s-regreso" onclick="cambiarSeasonal('Regreso a Clases', 's-regreso')" class="seasonal-item cursor-pointer bg-gray-800/50 border border-gray-600 hover:border-gray-500 rounded-xl p-4 text-center transition-all">
+                        <div class="text-3xl mb-2">🎒</div>
+                        <div class="font-bold text-gray-200">Regreso a Clases</div>
+                    </div>
+                    <div id="s-navidad" onclick="cambiarSeasonal('Navidad', 's-navidad')" class="seasonal-item cursor-pointer bg-gray-800/50 border border-gray-600 hover:border-gray-500 rounded-xl p-4 text-center transition-all">
+                        <div class="text-3xl mb-2">🎄</div>
+                        <div class="font-bold text-gray-200">Navidad</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mb-10">
+                <button id="btnGenerar" onclick="mostrarAssortment()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-12 rounded-full text-lg shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <span>Generar Reporte:</span> <span id="texto-seasonal" class="font-black">Mundial</span>
+                </button>
+            </div>
+
+            <div id="loader" class="hidden flex flex-col items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
+                <p class="text-gray-400 animate-pulse">Procesando datos...</p>
+            </div>
+
+            <div id="contenedor-resultados" class="hidden space-y-8">
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="bg-gray-800/50 px-6 py-4 border-b border-gray-800">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">🏷️ Resumen de Promociones</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold">Business Unit</th>
+                                    <th class="p-4 text-center font-semibold">Bueno (30%+)</th>
+                                    <th class="p-4 text-center font-semibold">Regular (15-29%)</th>
+                                    <th class="p-4 text-center font-semibold">BAU (<15%)</th>
+                                    <th class="p-4 text-right font-semibold">Total Promos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoResumen" class="divide-y divide-gray-800/50 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="bg-gray-800/50 px-6 py-4 border-b border-gray-800">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">📦 Assortment y Stock</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-900/50 text-gray-400 text-xs uppercase tracking-wider">
+                                    <th class="p-4 font-semibold">Corredor</th>
+                                    <th class="p-4 font-semibold">Producto</th>
+                                    <th class="p-4 text-center font-semibold">Ventas Est.</th>
+                                    <th class="p-4 text-right font-semibold">Stock Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTabla" class="divide-y divide-gray-800/50 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function manejarRespuestaGoogle(response) {
+            const datosUsuario = JSON.parse(atob(response.credential.split('.')[1]));
+            document.body.classList.remove('bg-gray-50');
+            document.body.classList.add('bg-gray-950');
+            document.getElementById('pantalla-login').classList.add('hidden');
+            document.getElementById('contenido-dashboard').classList.remove('hidden');
+            if(document.getElementById('user-email-display')) {
+                document.getElementById('user-email-display').innerText = datosUsuario.email;
+            }
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                // 👇 REEMPLAZA ESTO CON TU CLIENT ID
+                client_id: "882230098294-ho88v3ijq5br65fqegp33ce861mquu69.apps.googleusercontent.com", 
+                callback: manejarRespuestaGoogle,
+                hosted_domain: "rappi.com"
+            });
+            
+            google.accounts.id.renderButton(
+                document.getElementById("google-btn-container"),
+                { theme: "outline", size: "large", shape: "pill", logo_alignment: "left" }  
+            );
+        };
+
+        function cerrarSesion() {
+            window.location.reload(); 
+        }
+
+        // --- LÓGICA DE DATOS ---
+        // Aquí Python inyectará el JSON usando .replace()
+        const datosGenerales = {"resumen_promos": {"s-mundial": [{"BU": "Bebidas", "Bueno": 12, "Regular": 5, "BAU": 2, "Total": 19}], "s-verano": [], "s-regreso": [], "s-navidad": []}, "assortment": {"s-mundial": [{"corredor": "Snacks", "producto": "Papas 200g", "ventas": "Alto", "stock": 450}], "s-verano": [], "s-regreso": [], "s-navidad": []}}; 
+        
+        const baseDatosGlobal = datosGenerales.assortment;
+        const basePromos = datosGenerales.resumen_promos;
+        
+        let seasonalActualId = 's-mundial';
+
+        function cambiarSeasonal(nombre, idElemento) {
+            seasonalActualId = idElemento;
+            
+            const items = document.querySelectorAll('.seasonal-item');
+            items.forEach(item => {
+                item.classList.remove('bg-gray-800', 'border-orange-500');
+                item.classList.add('bg-gray-800/50', 'border-gray-600');
+            });
+
+            const elementoActivo = document.getElementById(idElemento);
+            elementoActivo.classList.remove('bg-gray-800/50', 'border-gray-600');
+            elementoActivo.classList.add('bg-gray-800', 'border-orange-500');
+
+            document.getElementById('texto-seasonal').innerText = nombre;
+            
+            document.getElementById('contenedor-resultados').classList.add('hidden');
+            document.getElementById('btnGenerar').classList.remove('hidden');
+        }
+
+        function mostrarAssortment() {
+            const btn = document.getElementById('btnGenerar');
+            const loader = document.getElementById('loader');
+            const contenedor = document.getElementById('contenedor-resultados');
+            const cuerpoResumen = document.getElementById('cuerpoResumen');
+            const cuerpoTabla = document.getElementById('cuerpoTabla');
+
+            btn.classList.add('hidden');
+            loader.classList.remove('hidden');
+
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                contenedor.classList.remove('hidden');
+                
+                const promos = basePromos[seasonalActualId] || [];
+                if(promos.length > 0) {
+                    cuerpoResumen.innerHTML = promos.map(row => `
+                        <tr class="hover:bg-gray-800/50 transition-colors">
+                            <td class="p-3 font-bold text-gray-200">${row.BU}</td>
+                            <td class="p-3 text-center text-red-400 font-semibold">${row.Bueno > 0 ? row.Bueno : '-'}</td>
+                            <td class="p-3 text-center text-yellow-400 font-semibold">${row.Regular > 0 ? row.Regular : '-'}</td>
+                            <td class="p-3 text-center text-blue-400 font-semibold">${row.BAU > 0 ? row.BAU : '-'}</td>
+                            <td class="p-3 text-right font-mono text-gray-400">${row.Total}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    cuerpoResumen.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500 italic">No hay datos de promociones.</td></tr>`;
+                }
+                
+                const surtido = baseDatosGlobal[seasonalActualId] || [];
+                if(surtido.length > 0) {
+                    cuerpoTabla.innerHTML = surtido.map(item => `
+                        <tr class="hover:bg-gray-800/40 transition-colors">
+                            <td class="p-4 font-bold text-orange-400/80">${item.corredor}</td>
+                            <td class="p-4 text-gray-200">${item.producto}</td>
+                            <td class="p-4 text-center text-gray-400">${item.ventas}</td>
+                            <td class="p-4 text-right font-mono text-green-400">${item.stock.toLocaleString('en-US')} u.</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    cuerpoTabla.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 italic">No hay productos.</td></tr>`;
+                }
+
+                document.getElementById('contenedor-resultados').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            }, 800); 
+        }
+    </script>
+</body>
+</html>
